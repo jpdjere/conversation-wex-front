@@ -313,7 +313,7 @@ function answerBack(data) {
           obj_msg.context = data.Response.context;
           writeAnswer(obj_msg);
 
-      }else if(data.Datos.Documentos !== undefined){
+      }else if(data.Datos.Documentos !== undefined && data.Datos.Code !== 404 && data.Datos.Code !== 400){
 
           //mensaje error
           if(typeof(data.Datos.Documentos) == "string"){
@@ -325,7 +325,16 @@ function answerBack(data) {
                     html_message+="<p style='margin-bottom:20px'><i>No comprendí exactamente lo que quisiste decir. Estos documentos pueden ayudarte:\n\n</i></p>";
                   }
 
-                  html_message+=`<p><a href="${data.Datos.Documentos[i].URL}"><b>${data.Datos.Documentos[i].Titulo}</b></a></p>`;
+                  //Creo la nueva URL que es online, en el proyecto sublido a Bluemix
+                  var fileName = decodeURI(data.Datos.Documentos[i].URL).split("/")[decodeURI(data.Datos.Documentos[i].URL).split("/").length-1];
+                  var newURL = 'https://uploadedwexfiles.mybluemix.net/files/'+fileName;
+
+                  //Si la URL es un HTML, lo dejo como viene para que linkee al archivo online, sino reemplazo
+                  if(fileName.substr(fileName.length-4) === 'html' || fileName.substr(fileName.length-3) === 'htm'){
+                    html_message+=`<p><a target="_blank" href="${data.Datos.Documentos[i].URL}"><b>${data.Datos.Documentos[i].Titulo}</b></a></p>`;
+                  }else{
+                    html_message+=`<p><a target="_blank" href="${newURL}"><b>${data.Datos.Documentos[i].Titulo}</b></a></p>`;
+                  }
 
                   if(data.Datos.Documentos[i].ParrafoDestacado.substring(0,2) == '<p'){
                       html_message+=data.Datos.Documentos[i].ParrafoDestacado;
@@ -347,6 +356,17 @@ function answerBack(data) {
 
           writeAnswer(obj_msg);
 
+      }else{
+        var obj_msg = {
+          'from': 'wex',
+          'message': "<p>No entendí lo que dijiste ni encontré documentos con los que ayudarte. Por favor, probá preguntándome de otra manera.</p>",
+          // 'suggestion': html_suggestion_topics,
+          // 'possible_questions': html_possible_questions,
+          // 'confidence': confidence,
+          'time': currentTime()
+        };
+
+        writeAnswer(obj_msg);
       }
 
     }
