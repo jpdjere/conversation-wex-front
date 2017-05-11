@@ -312,6 +312,7 @@ function answerBack(data) {
 
           obj_msg.context = data.Response.context;
           writeAnswer(obj_msg);
+
       }else if(data.Datos.Documentos !== undefined){
 
           //mensaje error
@@ -320,19 +321,23 @@ function answerBack(data) {
           }else{
               for (i = 0; i < data.Datos.Documentos.length; i++) {
 
-                  html_message+="<p>"+data.Datos.Documentos[i].Titulo+"</p>";
+                  if(i === 0){
+                    html_message+="<p style='margin-bottom:20px'><i>No comprendí exactamente lo que quisiste decir. Estos documentos pueden ayudarte:\n\n</i></p>";
+                  }
+
+                  html_message+=`<p><a href="${data.Datos.Documentos[i].URL}"><b>${data.Datos.Documentos[i].Titulo}</b></a></p>`;
 
                   if(data.Datos.Documentos[i].ParrafoDestacado.substring(0,2) == '<p'){
                       html_message+=data.Datos.Documentos[i].ParrafoDestacado;
                   }else{
-                      html_message+="<p>"+data.Datos.Documentos[i].ParrafoDestacado+"</p>";
+                      html_message+=`<p style='margin-bottom:20px'>${data.Datos.Documentos[i].ParrafoDestacado}</p>`;
                   }
 
               }
           }
 
           var obj_msg = {
-            'from': 'watson',
+            'from': 'wex',
             'message': html_message,
             // 'suggestion': html_suggestion_topics,
             // 'possible_questions': html_possible_questions,
@@ -347,6 +352,8 @@ function answerBack(data) {
     }
 
 }
+
+
 
 function writeAnswer(obj){
     hideLoad();
