@@ -242,29 +242,29 @@ function pauseConversation(){
 
 //answerBack
 function answerBack(data) {
+
     console.log(data);
     if(data){
         var html_message = '';
 
-        console.log(data);
         //mensaje error
         if(typeof(data.input) == "string"){
             html_message+= 'Hubo un error. Por favor intenta más tarde.';
         }else{
-            for (i = 0; i < data.msg.length; i++) {
+            for (i = 0; i < data.Response.output.text.length; i++) {
 
-                if(data.msg[i].substring(0,2) == '<p'){
-                    html_message+=data.msg[i];
+                if(data.Response.output.text[i].substring(0,2) == '<p'){
+                    html_message+=data.Response.output.text[i];
                 }else{
-                    html_message+="<p>"+data.msg[i]+"</p>";
+                    html_message+="<p>"+data.Response.output.text[i]+"</p>";
                 }
 
-                console.log(data.context.USR_03_options);
+                console.log(data.Response.context.USR_03_options);
 
-                if(data.context.USR_03_options){
+                if(data.Response.context.USR_03_options){
                     html_message+='<ul class="answer-options">';
-                    for (i = 0; i < data.context.USR_03_options.length; i++) {
-                        html_message+='<li><a onclick="writeAndSendMessage(\''+data.context.USR_03_options[i]+'\');">'+data.context.USR_03_options[i]+'</a></li>';
+                    for (i = 0; i < data.Response.context.USR_03_options.length; i++) {
+                        html_message+='<li><a onclick="writeAndSendMessage(\''+data.Response.context.USR_03_options[i]+'\');">'+data.Response.context.USR_03_options[i]+'</a></li>';
                     }
                     html_message+='</ul>';
                 }
@@ -274,12 +274,12 @@ function answerBack(data) {
 
         //sugerencias
         var html_suggestion_topics = '';
-        if(data.context){
-            if(data.context.USR_02_suggestion_topics && data.context.USR_02_suggestion_topics.length){
+        if(data.Response.context){
+            if(data.Response.context.USR_02_suggestion_topics && data.Response.context.USR_02_suggestion_topics.length){
                 html_suggestion_topics+='<div class="header"><h2>Puedo sugerirte</h2></div>';
                 html_suggestion_topics+= '<ul>';
-                for(var i in data.context.USR_02_suggestion_topics){
-                    html_suggestion_topics+='<li><a onclick="writeAndSendMessage(\''+data.context.USR_02_suggestion_topics[i]+'\');">'+data.context.USR_02_suggestion_topics[i]+'</a></li>';
+                for(var i in data.Response.context.USR_02_suggestion_topics){
+                    html_suggestion_topics+='<li><a onclick="writeAndSendMessage(\''+data.Response.context.USR_02_suggestion_topics[i]+'\');">'+data.Response.context.USR_02_suggestion_topics[i]+'</a></li>';
                 }
                 html_suggestion_topics+= '</ul>';
             }
@@ -287,10 +287,10 @@ function answerBack(data) {
 
         //alternativas
         var html_possible_questions = '';
-        if( data.context.USR_01_alt_questions.length){
+        if( data.Response.context.USR_01_alt_questions.length){
             html_possible_questions+= '<ul class="answer-options">';
-            for(var i = 0; i<data.context.USR_01_alt_questions.length; i++){
-                html_possible_questions+='<li><a class="possibleQuestion" onclick="writeAndSendMessage(\''+data.context.USR_01_alt_questions[i]+'\');">'+data.context.USR_01_alt_questions+'</a></li>';
+            for(var i = 0; i<data.Response.context.USR_01_alt_questions.length; i++){
+                html_possible_questions+='<li><a class="possibleQuestion" onclick="writeAndSendMessage(\''+data.Response.context.USR_01_alt_questions[i]+'\');">'+data.Response.context.USR_01_alt_questions+'</a></li>';
             }
             html_possible_questions+= '</ul>';
         }
@@ -304,7 +304,7 @@ function answerBack(data) {
             'time': currentTime()
         };
 
-        obj_msg.context = data.context;
+        obj_msg.context = data.Response.context;
         writeAnswer(obj_msg);
     }
 }
@@ -313,7 +313,7 @@ function writeAnswer(obj){
     hideLoad();
 
     addWatson();
-
+    console.log(obj);
     messageSuccess = document.createElement("div");
     messageSuccess.className = "message received";
     messageSuccess.innerHTML = '<div class="message-block">'+obj.message+'</div><div class="time">'+obj.time+'</div>';
@@ -355,6 +355,8 @@ function writeAnswer(obj){
 
     $chatWindow.scrollTop = $chatWindow.scrollHeight-_height-35;
 }
+
+
 
 function writeAndSendMessage(message){
     if(message == '') return;
