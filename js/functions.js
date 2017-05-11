@@ -245,68 +245,107 @@ function answerBack(data) {
 
     console.log(data);
     if(data){
+    //Si vuelve data
+
         var html_message = '';
-
-        //mensaje error
-        if(typeof(data.input) == "string"){
-            html_message+= 'Hubo un error. Por favor intenta más tarde.';
-        }else{
-            for (i = 0; i < data.Response.output.text.length; i++) {
-
-                if(data.Response.output.text[i].substring(0,2) == '<p'){
-                    html_message+=data.Response.output.text[i];
-                }else{
-                    html_message+="<p>"+data.Response.output.text[i]+"</p>";
-                }
-
-                console.log(data.Response.context.USR_03_options);
-
-                if(data.Response.context.USR_03_options){
-                    html_message+='<ul class="answer-options">';
-                    for (i = 0; i < data.Response.context.USR_03_options.length; i++) {
-                        html_message+='<li><a onclick="writeAndSendMessage(\''+data.Response.context.USR_03_options[i]+'\');">'+data.Response.context.USR_03_options[i]+'</a></li>';
-                    }
-                    html_message+='</ul>';
-                }
-            }
-        }
+        if(data.Response){
+          console.log("Entre a generacion de mensajes de Conversation");
 
 
-        //sugerencias
-        var html_suggestion_topics = '';
-        if(data.Response.context){
-            if(data.Response.context.USR_02_suggestion_topics && data.Response.context.USR_02_suggestion_topics.length){
-                html_suggestion_topics+='<div class="header"><h2>Puedo sugerirte</h2></div>';
-                html_suggestion_topics+= '<ul>';
-                for(var i in data.Response.context.USR_02_suggestion_topics){
-                    html_suggestion_topics+='<li><a onclick="writeAndSendMessage(\''+data.Response.context.USR_02_suggestion_topics[i]+'\');">'+data.Response.context.USR_02_suggestion_topics[i]+'</a></li>';
-                }
-                html_suggestion_topics+= '</ul>';
-            }
-        }
 
-        //alternativas
-        var html_possible_questions = '';
-        if( data.Response.context.USR_01_alt_questions.length){
-            html_possible_questions+= '<ul class="answer-options">';
-            for(var i = 0; i<data.Response.context.USR_01_alt_questions.length; i++){
-                html_possible_questions+='<li><a class="possibleQuestion" onclick="writeAndSendMessage(\''+data.Response.context.USR_01_alt_questions[i]+'\');">'+data.Response.context.USR_01_alt_questions+'</a></li>';
-            }
-            html_possible_questions+= '</ul>';
-        }
+          //mensaje error
+          if(typeof(data.input) == "string"){
+              html_message+= 'Hubo un error. Por favor intenta más tarde.';
+          }else{
+              for (i = 0; i < data.Response.output.text.length; i++) {
 
-        var obj_msg = {
+                  if(data.Response.output.text[i].substring(0,2) == '<p'){
+                      html_message+=data.Response.output.text[i];
+                  }else{
+                      html_message+="<p>"+data.Response.output.text[i]+"</p>";
+                  }
+
+                  console.log(data.Response.context.USR_03_options);
+
+                  if(data.Response.context.USR_03_options){
+                      html_message+='<ul class="answer-options">';
+                      for (i = 0; i < data.Response.context.USR_03_options.length; i++) {
+                          html_message+='<li><a onclick="writeAndSendMessage(\''+data.Response.context.USR_03_options[i]+'\');">'+data.Response.context.USR_03_options[i]+'</a></li>';
+                      }
+                      html_message+='</ul>';
+                  }
+              }
+          }
+
+
+          //sugerencias
+          var html_suggestion_topics = '';
+          if(data.Response.context){
+              if(data.Response.context.USR_02_suggestion_topics && data.Response.context.USR_02_suggestion_topics.length){
+                  html_suggestion_topics+='<div class="header"><h2>Puedo sugerirte</h2></div>';
+                  html_suggestion_topics+= '<ul>';
+                  for(var i in data.Response.context.USR_02_suggestion_topics){
+                      html_suggestion_topics+='<li><a onclick="writeAndSendMessage(\''+data.Response.context.USR_02_suggestion_topics[i]+'\');">'+data.Response.context.USR_02_suggestion_topics[i]+'</a></li>';
+                  }
+                  html_suggestion_topics+= '</ul>';
+              }
+          }
+
+          //alternativas
+          var html_possible_questions = '';
+          if( data.Response.context.USR_01_alt_questions.length){
+              html_possible_questions+= '<ul class="answer-options">';
+              for(var i = 0; i<data.Response.context.USR_01_alt_questions.length; i++){
+                  html_possible_questions+='<li><a class="possibleQuestion" onclick="writeAndSendMessage(\''+data.Response.context.USR_01_alt_questions[i]+'\');">'+data.Response.context.USR_01_alt_questions+'</a></li>';
+              }
+              html_possible_questions+= '</ul>';
+          }
+
+          var obj_msg = {
+              'from': 'watson',
+              'message': html_message,
+              'suggestion': html_suggestion_topics,
+              'possible_questions': html_possible_questions,
+              // 'confidence': confidence,
+              'time': currentTime()
+          };
+
+          obj_msg.context = data.Response.context;
+          writeAnswer(obj_msg);
+      }else if(data.Datos.Documentos !== undefined){
+
+          //mensaje error
+          if(typeof(data.Datos.Documentos) == "string"){
+              html_message+= 'Hubo un error. Por favor intenta más tarde.';
+          }else{
+              for (i = 0; i < data.Datos.Documentos.length; i++) {
+
+                  html_message+="<p>"+data.Datos.Documentos[i].Titulo+"</p>";
+
+                  if(data.Datos.Documentos[i].ParrafoDestacado.substring(0,2) == '<p'){
+                      html_message+=data.Datos.Documentos[i].ParrafoDestacado;
+                  }else{
+                      html_message+="<p>"+data.Datos.Documentos[i].ParrafoDestacado+"</p>";
+                  }
+
+              }
+          }
+
+          var obj_msg = {
             'from': 'watson',
             'message': html_message,
-            'suggestion': html_suggestion_topics,
-            'possible_questions': html_possible_questions,
+            // 'suggestion': html_suggestion_topics,
+            // 'possible_questions': html_possible_questions,
             // 'confidence': confidence,
             'time': currentTime()
-        };
+          };
 
-        obj_msg.context = data.Response.context;
-        writeAnswer(obj_msg);
+          writeAnswer(obj_msg);
+
+      }
+
     }
+
 }
 
 function writeAnswer(obj){
