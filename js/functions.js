@@ -33,6 +33,7 @@ var $closeSatisfaction;
 var $minimizeSatisfaction;
 var $stars;
 
+var html_ticket = [];
 // ---
 
 // READY
@@ -269,8 +270,8 @@ function answerBack(data) {
 
                   if(data.Response.context.USR_03_options){
                       html_message+='<ul class="answer-options">';
-                      for (i = 0; i < data.Response.context.USR_03_options.length; i++) {
-                          html_message+='<li><a onclick="writeAndSendMessage(\''+data.Response.context.USR_03_options[i]+'\');">'+data.Response.context.USR_03_options[i]+'</a></li>';
+                      for (j = 0; j < data.Response.context.USR_03_options.length; j++) {
+                          html_message+='<li><a onclick="writeAndSendMessage(\''+data.Response.context.USR_03_options[j]+'\');">'+data.Response.context.USR_03_options[j]+'</a></li>';
                       }
                       html_message+='</ul>';
                   }
@@ -296,10 +297,24 @@ function answerBack(data) {
           if( data.Response.context.USR_01_alt_questions.length){
               html_possible_questions+= '<ul class="answer-options">';
               for(var i = 0; i<data.Response.context.USR_01_alt_questions.length; i++){
-                  html_possible_questions+='<li><a class="possibleQuestion" onclick="writeAndSendMessage(\''+data.Response.context.USR_01_alt_questions[i]+'\');">'+data.Response.context.USR_01_alt_questions+'</a></li>';
+                  html_possible_questions+='<li><a class="possibleQuestion" onclick="writeAndSendMessage(\''+data.Response.context.USR_01_alt_questions[i]+'\');">'+data.Response.context.USR_01_alt_questions[i]+'</a></li>';
               }
               html_possible_questions+= '</ul>';
           }
+
+          //otras Intentions
+          // var html_possible_questions = '';
+          // //Si viene mas de una intención
+          // // for(i in )
+          // if( data.Response.intents.length > 1){
+          //     html_possible_questions+= '<ul class="answer-options">';
+          //     //Agarro la segunda y la tercera
+          //     for(var i = 1; i<3; i++){
+          //         // html_possible_questions+='<li><a class="possibleQuestion" onclick="writeAndSendMessage(\''+data.Response.context.USR_01_alt_questions[i]+'\');">'+data.Response.context.USR_01_alt_questions+'</a></li>';
+          //         html_possible_questions+=`<li><a class="possibleQuestion" onclick="writeAndSendMessage('${data.Response.context.intent}');">${data.Response.intents[i].intent}</a></li>`;
+          //     }
+          //     html_possible_questions+= '</ul>';
+          // }
 
           var obj_msg = {
               'from': 'watson',
@@ -322,19 +337,84 @@ function answerBack(data) {
               for (i = 0; i < data.Datos.Documentos.length; i++) {
 
                   if(i === 0){
-                    html_message+="<p style='margin-bottom:20px'><i>No comprendí exactamente lo que quisiste decir. Estos documentos pueden ayudarte:\n\n</i></p>";
+                    html_message+="<p style='margin-bottom:20px'><i>Encontré esta información que puede ayudarte:\n\n</i></p>";
                   }
 
-                  //Creo la nueva URL que es online, en el proyecto sublido a Bluemix
-                  var fileName = decodeURI(data.Datos.Documentos[i].URL).split("/")[decodeURI(data.Datos.Documentos[i].URL).split("/").length-1];
-                  var newURL = 'https://uploadedwexfiles.mybluemix.net/files/'+fileName;
+                  // //Creo la nueva URL que es online, en el proyecto sublido a Bluemix
+                  // var fileName = decodeURI(data.Datos.Documentos[i].URL).split("/")[decodeURI(data.Datos.Documentos[i].URL).split("/").length-1];
+                  // var newURL = 'https://uploadedwexfiles.mybluemix.net/files/'+fileName;
+                  //
+                  // //Si la URL es un HTML, lo dejo como viene para que linkee al archivo online, sino reemplazo
+                  // if(fileName.substr(fileName.length-4) === 'html' || fileName.substr(fileName.length-3) === 'htm'){
+                  //   html_message+=`<p><a target="_blank" href="${data.Datos.Documentos[i].URL}"><b>${data.Datos.Documentos[i].Titulo}</b></a></p>`;
+                  // }else{
+                  //   html_message+=`<p><a target="_blank" href="${newURL}"><b>${data.Datos.Documentos[i].Titulo}</b></a></p>`;
+                  // }
 
-                  //Si la URL es un HTML, lo dejo como viene para que linkee al archivo online, sino reemplazo
-                  if(fileName.substr(fileName.length-4) === 'html' || fileName.substr(fileName.length-3) === 'htm'){
-                    html_message+=`<p><a target="_blank" href="${data.Datos.Documentos[i].URL}"><b>${data.Datos.Documentos[i].Titulo}</b></a></p>`;
-                  }else{
-                    html_message+=`<p><a target="_blank" href="${newURL}"><b>${data.Datos.Documentos[i].Titulo}</b></a></p>`;
-                  }
+                  //Limpio el ParrafoDestacado y lo meto en una variable nueva.
+                  //Primero corto los ultimos 5 caracteres
+                  // var parrafo = data.Datos.Documentos[i].ParrafoDestacado.substring(0,data.Datos.Documentos[i].ParrafoDestacado.length-5)
+                  // //Ahora trimeo espacios adelante y atras
+                  // parrafo = parrafo.trim();
+                  // // console.log("El parrafo entero es:");
+                  // // console.log(parrafo);
+                  // // console.log("El parrafo recortado es:");
+                  // // console.log(parrafo.substring(0,150));
+                  // // console.log("El parrafo spliteado por ... es:");
+                  // allPars = parrafo.split("...");
+                  // // console.log(allPars);
+                  // // console.log(allPars[0]);
+                  //
+                  // // console.log("El parrafo spliteado por palabras es:");
+                  // allWords = parrafo.split(" ");
+                  // // console.log(allWords);
+                  //
+                  // fiveWords = allPars[0].split(" ").slice(0, 5).join(" ");
+                  // hundredWords = allPars[0].split(" ").slice(0, 100).join(" ");
+                  //
+                  // // console.log("Las primeras 5 palabras del primer parrafo son:");
+                  // // console.log(fiveWords);
+                  // //
+                  // // console.log("Las primeras 100 palabras del primer parrafo son:");
+                  // // console.log(hundredWords);
+                  //
+                  //
+                  //
+                  //
+                  //
+                  // //Remove every element with value number from the array:
+                  //
+                  // // for(var i = array.length - 1; i >= 0; i--) {
+                  // //     if(array[i] === number) {
+                  // //        array.splice(i, 1);
+                  // //     }
+                  // // }
+                  //
+                  //
+                  //
+                  // //Necesito escapear las barras / porque sino el new RegExp se rompe
+                  // // parrafoStringToRegex = escapeRegExp(fiveWords);
+                  // parrafoStringToRegex = fiveWords;
+                  //
+                  // parrafoRegex = /[\n\r].*Buenos Aires\s*([^\n\r]*)/;
+
+                  // parrafoRegex = new RegExp("[/\n/\r].*" + parrafoStringToRegex + "/\s*([^/\n/\r]*)", 'i');
+
+                  //Genero un array con los caches de los documentos
+                  html_ticket[i] = data.Datos.Documentos[i].Cache;
+
+                  //Busco a ver si encuentra el parrafo en todo el HTML
+                  // console.log("Encontro el parrafo???")
+                  // console.log("parrafoRegex");
+                  // console.log(typeof parrafoRegex, parrafoRegex);
+                  // console.log(html_ticket[i].search(parrafoRegex))
+                  //
+                  // //Reemplazo el HTML por el HTML subrayado
+                  // html_ticket[i] = html_ticket[i].replaceAll(parrafoRegex,'<span style=background:yellow>'+parrafoStringToRegex+'</span>');
+
+
+                  //Genero el titulo con un link a una tab nueva y el html - (Elimino el style.featherlight-inner' que me hace mostrar basura)
+                  html_message+=`<p onclick="$.featherlight(html_ticket[${i}], {});$('style.featherlight-inner').css('display','none')"><b>${data.Datos.Documentos[i].Titulo}</b></p>`;
 
                   if(data.Datos.Documentos[i].ParrafoDestacado.substring(0,2) == '<p'){
                       html_message+=data.Datos.Documentos[i].ParrafoDestacado;
@@ -637,4 +717,15 @@ var addYo = function(id){
     sendYo.innerHTML = '<div class="yo">Yo</div>';
     if(typeof id != "undefined") sendYo.id = id;
     $chatWindow.appendChild(sendYo);
+}
+
+//Creo funcion para reemplazar todas las instancias de algo en un string.
+String.prototype.replaceAll = function(search, replacement) {
+    var target = this;
+    return target.replace(new RegExp(search, 'g'), replacement);
+};
+
+//Escapo los RegEx special characters
+function escapeRegExp(text) {
+  return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
 }
