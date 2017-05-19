@@ -439,7 +439,7 @@ function answerBack(data) {
       }else{
         var obj_msg = {
           'from': 'wex',
-          'message': "<p>No entendí lo que dijiste ni encontré documentos con los que ayudarte. Por favor, probá preguntándome de otra manera.</p>",
+          'message': "<p>No encontré información para ayudarte con tu consulta. Por favor, probá preguntándome de otra manera.</p>",
           // 'suggestion': html_suggestion_topics,
           // 'possible_questions': html_possible_questions,
           // 'confidence': confidence,
@@ -480,7 +480,7 @@ function writeAnswer(obj){
 
         messagePossibleQuestions = document.createElement("div");
         messagePossibleQuestions.className = "possible-questions";
-        messagePossibleQuestions.innerHTML = '<p>¿Esto responde a tu pregunta? <a class="removePossibleQuestions" id="bad">Si</a> - <a class="showPossibleQuestions">No</a></p><div class="hidden-possible-questions"><p>A lo mejor quisiste preguntar por esto:</p>'+obj.possible_questions+'</div>';
+        messagePossibleQuestions.innerHTML = '<p>¿Esto responde a tu pregunta? <a class="removePossibleQuestions" id="bad">Si</a> - <a class="showPossibleQuestions">No</a></p><div class="hidden-possible-questions"><p>Podría interesarte:</p>'+obj.possible_questions+'</div>';
         messagePossibleQuestions.innerHTML+= '<div class="clear"></div>';
         $chatWindow.appendChild(messagePossibleQuestions);
 
